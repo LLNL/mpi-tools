@@ -1,0 +1,20 @@
+MPI_INSTALL = /collab/usr/global/tools/mpi/hackathon/mv2-exp7/install
+CC= $(MPI_INSTALL)/bin/mpicc
+FLAGS=-g -O0 -fPIC -Wall 
+LIBPATH=-L$(MPI_INSTALL)/lib
+INCLUDE=-I$(MPI_INSTALL)/include -I$(MPI_INSTALL)/include
+LIBS=libgyan.so
+EXE=tool.o
+TESTDIR=tests
+
+all:
+	$(CC) $(FLAGS) -c utility.c -o utility.o
+	$(CC) $(FLAGS) -c gyan.c -o gyan.o
+	ar rcs libgyan.a gyan.o
+	$(CC) -shared -o libgyan.so utility.o gyan.o
+	$(CC) $(FLAGS) $(INCLUDE) $(TESTDIR)/osu_bw.c $(LIBPATH) -o $(TESTDIR)/osu_bw $(LIBS)
+	$(CC) $(FLAGS) $(INCLUDE) $(TESTDIR)/osu_bcast.c $(LIBPATH) -o $(TESTDIR)/osu_bcast $(LIBS)
+clean:
+	rm -f *.o
+	rm -f $(TESTDIR)/osu_bw $(TESTDIR)/osu_bcast
+	rm -f libgyan.so libgyan.a

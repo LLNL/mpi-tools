@@ -1,0 +1,19 @@
+Build Instructions
+------------------
+- Set MPI_INSTALL in Makefile to point to an MPI-T compliant MPI
+  installation
+- Run "make"
+
+
+Usage Instructions
+------------------
+
+- Gyan can be used in one of two ways:
+    - By dynamically loading the libgyan shared-library.
+        $ LD_PRELOAD=$GYAN_INSTALL_PATH/libgyan.so srun -n 2 mpi_app
+    - By statically linking the MPI application to libgyan.
+        $ srun -n 2 mpi_app
+
+- The sample MPI benchmarks in "tests" folder have been statically linked to
+  libgyan, and can be used to test the installation. Run them as follows:
+    $ srun -n 2 ./tests/osu_bcast
