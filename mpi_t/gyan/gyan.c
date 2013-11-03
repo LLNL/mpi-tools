@@ -261,48 +261,6 @@ static void collect_range_with_loc_from_all_ranks(MPI_Op op){
 		free(out);
 }
 
-//static void collect_range_with_loc_from_all_ranks(MPI_Op op){
-//	int i;
-//	int j;
-//	int root = 0;
-//	unsigned long long int *in;
-//	unsigned long long int *out;
-//
-//	/**
-//	 * Pack all variables into a buffer
-//	 */
-//	/**
-//	 * MPI_Reduce on each element. Each element here is a performance variable
-//	 */
-//	in = (unsigned long long int*)malloc(sizeof(unsigned long long int) * ( max_num_of_state_per_pvar + 1));
-//	if(rank == root)
-//		out = (unsigned long long int*)malloc(sizeof(unsigned long long int) * (max_num_of_state_per_pvar + 1));
-//	for(i = 0; i < pvar_num_watched; i++){
-//		for(j = 0; j < pvar_count[i]; j++){
-//			in[j] = 0;
-//			in[j] = (pvar_value_buffer[i][j]);
-//		}
-//		PMPI_Reduce(in, out, pvar_count[i] /*number_of_elements*/, MPI_UNSIGNED_LONG_LONG, op, root, MPI_COMM_WORLD);
-//		//printout
-//		if(root == rank){
-//			for(j = 0; j < pvar_count[i]; j++){
-//				if(op == MPI_MIN){
-//					pvar_stat[i][j].min = out[j];
-//					pvar_stat[i][j].min_rank = rank;
-//				}
-//				else if(op == MPI_MAX){
-//					pvar_stat[i][j].max = out[j];
-//					pvar_stat[i][j].max_rank = rank;
-//				}
-//			}
-//		}
-//	}
-//	free(in);
-//	if(root == rank)
-//		free(out);
-//}
-
-
 int MPI_Init(int *argc, char ***argv){
 
 	if(DEBUG)printf("********** Interception starts **********\n");
@@ -501,19 +459,11 @@ int MPI_Init(int *argc, char ***argv){
 int MPI_Finalize(void)
 {
 	pvar_read_all();
-	int size1, size2;
-	MPI_Type_size(MPI_DOUBLE, &size1);
-	MPI_Type_size(MPI_UNSIGNED_LONG_LONG, &size2);
-	assert( size1 == size2 );
-	assert( sizeof(double) == sizeof(unsigned long long int));
 	/**
 	 * Collect statistics from all ranks onto root
 	 */
 	collect_range_with_loc_from_all_ranks(MPI_MINLOC);
 	collect_range_with_loc_from_all_ranks(MPI_MAXLOC);
-
-//	collect_range_with_loc_from_all_ranks(MPI_MIN);
-//	collect_range_with_loc_from_all_ranks(MPI_MAX);
 	collect_sum_from_all_ranks(MPI_SUM);
 
 	if(rank == 0){
