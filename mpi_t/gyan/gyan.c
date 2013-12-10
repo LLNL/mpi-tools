@@ -143,7 +143,7 @@ static void print_pvar_buffer_all(){
 				print_class(perf_var_all[index].var_class);
 				printf("\t%8llu(%3d)  %8llu(%3d)  %12.2lf\n", pvar_stat[i][j].min, pvar_stat[i][j].min_rank,
 						pvar_stat[i][j].max, pvar_stat[i][j].max_rank,
-						(pvar_stat[i][j].total / (double)num_mpi_tasks));
+						(pvar_stat[i][j].total / (float)num_mpi_tasks));
 			}
 		}
 	}
