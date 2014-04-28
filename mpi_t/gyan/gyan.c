@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2014, Lawrence Livermore National Security,
+//  LLC. Produced at the Lawrence Livermore National Laboratory. Written
+//  by Tanzima Z. Islam (islam3@llnl.gov).
+// CODE-LLNL-CODE-647221. All rights reserved.
+// This file is part of mpi_T-tools. For details, see
+//  https://computation-rnd.llnl.gov/mpi_t/gyan.php.
+// Please also read this file - FULL-LICENSE.txt.
+// This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License (as published by
+//  the Free Software Foundation) version 2.1 dated February 1999.
+// This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the terms
+//  and conditions of the GNU General Public License for more
+//  details. You should have received a copy of the GNU Lesser General
+//  Public License along with this program; if not, write to the Free
+//  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+//  02111-1307 USA
+//////////////////////////////////////////////////////////////////////////////
 /*
  * gyan.c
 
@@ -152,12 +172,12 @@ static void print_pvar_buffer_all(){
 static void pvar_read_all(){
 	int i, j;
 	int size;
-
+	unsigned long long int zero = 0;
 	for(i = 0; i < pvar_num_watched; i++){
 		MPI_T_pvar_read(session, pvar_handles[i], read_value_buffer);
 		MPI_Type_size(perf_var_all[i].datatype, &size);
 		for(j = 0; j < pvar_count[j]; j++){
-			pvar_value_buffer[i][j] = 0;
+			memcpy(&(pvar_value_buffer[i][j]), &zero, size);
 			memcpy(&(pvar_value_buffer[i][j]), read_value_buffer, size);
 		}
 	}
@@ -480,4 +500,16 @@ int MPI_Finalize(void)
 	PMPI_Barrier(MPI_COMM_WORLD);
 	MPI_T_finalize();
 	return PMPI_Finalize();
+}
+
+// For fortran code
+int MPI_Init_(int *ierror){
+	printf("------------- MPI_Init called from fortran -----------\n");	
+	 (*ierror) = MPI_Init(NULL, NULL);
+	 return *ierror;
+}
+int MPI_Finalize_(int *ierror){
+	printf("------------- MPI_Finalize called from fortran -----------\n");
+	 (*ierror) = MPI_Finalize();
+	 return *ierror;
 }
