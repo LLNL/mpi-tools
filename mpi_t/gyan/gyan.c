@@ -177,7 +177,8 @@ static void pvar_read_all(){
 		MPI_T_pvar_read(session, pvar_handles[i], read_value_buffer);
 		MPI_Type_size(perf_var_all[i].datatype, &size);
 		for(j = 0; j < pvar_count[j]; j++){
-			memcpy(&(pvar_value_buffer[i][j]), &zero, size);
+			pvar_value_buffer[i][j] = 0;
+			//memcpy(&(pvar_value_buffer[i][j]), &zero, size);
 			memcpy(&(pvar_value_buffer[i][j]), read_value_buffer, size);
 		}
 	}
@@ -440,6 +441,7 @@ int MPI_Init(int *argc, char ***argv){
 			err = MPI_T_pvar_handle_alloc(session, index, NULL, &pvar_handles[pvar_num_watched], &pvar_count[pvar_num_watched]);
 			if (err != MPI_SUCCESS)
 				return mpi_init_return;
+			// If err == MPI_SUCCESS
 			pvar_value_buffer[pvar_num_watched] = (unsigned long long int*)malloc(sizeof(unsigned long long int) * (pvar_count[pvar_num_watched] + 1));
 			pvar_stat[pvar_num_watched] = (STATISTICS*)malloc(sizeof(STATISTICS) * (pvar_count[pvar_num_watched] + 1));
 			memset(pvar_value_buffer[pvar_num_watched], 0, sizeof(unsigned long long int) * pvar_count[pvar_num_watched]);
@@ -456,8 +458,6 @@ int MPI_Init(int *argc, char ***argv){
 			if(perf_var_all[index].continuous == 0){
 				err = MPI_T_pvar_start(session, pvar_handles[pvar_num_watched]);
 			}
-			if (err != MPI_SUCCESS)
-				return mpi_init_return;
 			pvar_num_watched++;
 		}
 		p = strtok(NULL, ";");
@@ -500,16 +500,4 @@ int MPI_Finalize(void)
 	PMPI_Barrier(MPI_COMM_WORLD);
 	MPI_T_finalize();
 	return PMPI_Finalize();
-}
-
-// For fortran code
-int MPI_Init_(int *ierror){
-	printf("------------- MPI_Init called from fortran -----------\n");	
-	 (*ierror) = MPI_Init(NULL, NULL);
-	 return *ierror;
-}
-int MPI_Finalize_(int *ierror){
-	printf("------------- MPI_Finalize called from fortran -----------\n");
-	 (*ierror) = MPI_Finalize();
-	 return *ierror;
 }

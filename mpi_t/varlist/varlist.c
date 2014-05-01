@@ -484,16 +484,16 @@ void list_cvars()
 	unsigned long v_ulong;
 	unsigned long long v_ullong;
 	MPI_Count v_count;
-	char v_char;
+	char v_char[4097];
 	double v_double;
-	char value[100];
+	char value[257];
 	int value_sup;
 	MPI_T_cvar_handle handle=MPI_T_CVAR_HANDLE_NULL;
 	int count;
 
 	/* Get number of variables */
 
-	err=MPI_T_pvar_get_num(&num);
+	err=MPI_T_cvar_get_num(&num);
 	CHECKERR("CVARNUM",err);
 	printf("Found %i control variables\n",num);
 
@@ -560,6 +560,9 @@ void list_cvars()
 		namelen=maxnamelen;
 		desclen=maxdesclen;
 		err=MPI_T_cvar_get_info(i,name,&namelen,&verbos,&dt,&et,desc,&desclen,&bind,&scope);
+		if (MPI_T_ERR_INVALID_INDEX == err) {
+			continue;
+		}
 		CHECKERR("CVARINFO",err);
 
 		value_sup=1;
@@ -582,7 +585,7 @@ void list_cvars()
 
 		if (value_sup)
 		{
-			if (count==1)
+			if (count==1 || dt==MPI_CHAR)
 			{
 				if (dt==MPI_INT)
 				{
@@ -606,13 +609,13 @@ void list_cvars()
 							err=MPI_T_enum_get_item(et,i,&newval,etname,&etlen);
 							if (newval==v_int)
 							{
-								printf("%s",etname);
+								sprintf(value, "%s",etname);
 								done=1;
 							}
 						}
 						if (!done)
 						{
-							printf("unknown");
+							sprintf(value, "unknown");
 						}
 					}
 				}
@@ -642,9 +645,9 @@ void list_cvars()
 				}
 				else if (dt==MPI_CHAR)
 				{
-					err=MPI_T_cvar_read(handle,&v_char);
+					err=MPI_T_cvar_read(handle,v_char);
 					CHECKERR("CVARREAD",err);
-					sprintf(value,"%c",v_char);
+					sprintf(value,"%s",v_char);
 				}
 				else if (dt==MPI_DOUBLE)
 				{
