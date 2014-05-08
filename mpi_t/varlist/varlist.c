@@ -562,7 +562,7 @@ void list_cvars()
 		err=MPI_T_cvar_get_info(i,name,&namelen,&verbos,&dt,&et,desc,&desclen,&bind,&scope);
 		if (MPI_T_ERR_INVALID_INDEX == err)// { NOTE TZI: This variable is not recognized by Mvapich. It is OpenMPI specific.
 			continue;
-		}
+
 		CHECKERR("CVARINFO",err);
 
 		value_sup=1;
