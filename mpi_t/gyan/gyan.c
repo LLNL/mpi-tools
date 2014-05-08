@@ -153,7 +153,7 @@ static void print_pvar_buffer_all(){
 	int index;
 
 	printf("%-40s\tType   ", "Variable Name");
-	printf(" Minimum(Max_Rank)    Maximum(Min_Rank)       Average\n");
+	printf(" Minimum(Rank)    Maximum(Rank)       Average\n");
 	print_filled("",88,'-');
 	for(i = 0; i < pvar_num_watched; i++){
 		index = pvar_index[i];
@@ -163,7 +163,7 @@ static void print_pvar_buffer_all(){
 				print_class(perf_var_all[index].var_class);
 				printf("\t%8llu(%3d)  %8llu(%3d)  %12.2lf\n", pvar_stat[i][j].min, pvar_stat[i][j].min_rank,
 						pvar_stat[i][j].max, pvar_stat[i][j].max_rank,
-						(pvar_stat[i][j].total / (float)num_mpi_tasks));
+						(pvar_stat[i][j].total / (double)num_mpi_tasks));
 			}
 		}
 	}
@@ -178,7 +178,6 @@ static void pvar_read_all(){
 		MPI_Type_size(perf_var_all[i].datatype, &size);
 		for(j = 0; j < pvar_count[j]; j++){
 			pvar_value_buffer[i][j] = 0;
-			//memcpy(&(pvar_value_buffer[i][j]), &zero, size);
 			memcpy(&(pvar_value_buffer[i][j]), read_value_buffer, size);
 		}
 	}
@@ -439,26 +438,28 @@ int MPI_Init(int *argc, char ***argv){
 			pvar_index[pvar_num_watched] = index;
 			perf_var_all[index].pvar_index = pvar_num_watched;
 			err = MPI_T_pvar_handle_alloc(session, index, NULL, &pvar_handles[pvar_num_watched], &pvar_count[pvar_num_watched]);
-			if (err != MPI_SUCCESS)
-				return mpi_init_return;
-			// If err == MPI_SUCCESS
-			pvar_value_buffer[pvar_num_watched] = (unsigned long long int*)malloc(sizeof(unsigned long long int) * (pvar_count[pvar_num_watched] + 1));
-			pvar_stat[pvar_num_watched] = (STATISTICS*)malloc(sizeof(STATISTICS) * (pvar_count[pvar_num_watched] + 1));
-			memset(pvar_value_buffer[pvar_num_watched], 0, sizeof(unsigned long long int) * pvar_count[pvar_num_watched]);
-			for(k = 0; k < pvar_count[pvar_num_watched]; k++){
-				pvar_value_buffer[pvar_num_watched][k] = 0;
-				pvar_stat[pvar_num_watched][k].max = NEG_INF;
-				pvar_stat[pvar_num_watched][k].min = POS_INF;
-				pvar_stat[pvar_num_watched][k].total = 0;
+			if (err == MPI_SUCCESS){
+				pvar_value_buffer[pvar_num_watched] = (unsigned long long int*)malloc(sizeof(unsigned long long int) * (pvar_count[pvar_num_watched] + 1));
+				pvar_stat[pvar_num_watched] = (STATISTICS*)malloc(sizeof(STATISTICS) * (pvar_count[pvar_num_watched] + 1));
+				memset(pvar_value_buffer[pvar_num_watched], 0, sizeof(unsigned long long int) * pvar_count[pvar_num_watched]);
+				for(k = 0; k < pvar_count[pvar_num_watched]; k++){
+					pvar_value_buffer[pvar_num_watched][k] = 0;
+					pvar_stat[pvar_num_watched][k].max = NEG_INF;
+					pvar_stat[pvar_num_watched][k].min = POS_INF;
+					pvar_stat[pvar_num_watched][k].total = 0;
 
-			}
-			if(max_count < pvar_count[pvar_num_watched])
-				max_count = pvar_count[pvar_num_watched];
+				}
+				if(max_count < pvar_count[pvar_num_watched])
+					max_count = pvar_count[pvar_num_watched];
 
-			if(perf_var_all[index].continuous == 0){
-				err = MPI_T_pvar_start(session, pvar_handles[pvar_num_watched]);
+				if(perf_var_all[index].continuous == 0){
+					err = MPI_T_pvar_start(session, pvar_handles[pvar_num_watched]);
+				}
+				if (err != MPI_SUCCESS) {
+					return mpi_init_return;
+				}
+				pvar_num_watched++;
 			}
-			pvar_num_watched++;
 		}
 		p = strtok(NULL, ";");
 	}
