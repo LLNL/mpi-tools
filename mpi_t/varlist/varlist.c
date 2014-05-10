@@ -35,8 +35,9 @@ typedef int MPI_Count;
 #ifndef MPI_T_CVAR_HANDLE_NULL
 #define MPI_T_CVAR_HANDLE_NULL NULL
 #endif
-
-#define CHECKERR(errstr,err) if (err!=MPI_SUCCESS) { printf("ERROR: %s: MPI error code %i\n",errstr,err); usage(1); } 
+char errMsg[1000];
+int errMsgLen;
+#define CHECKERR(errstr,err) if (err!=MPI_SUCCESS) { printf("ERROR: %s: MPI error code %i: ",errstr,err); MPI_Error_string(err, errMsg, &errMsgLen); errMsg[errMsgLen]=0; printf("%s\n", errMsg); /*usage(1);*/ } 
 
 int list_pvar,list_cvar,longlist,verbosity,runmpi; 
 
@@ -560,8 +561,8 @@ void list_cvars()
 		namelen=maxnamelen;
 		desclen=maxdesclen;
 		err=MPI_T_cvar_get_info(i,name,&namelen,&verbos,&dt,&et,desc,&desclen,&bind,&scope);
-		if (MPI_T_ERR_INVALID_INDEX == err)// { NOTE TZI: This variable is not recognized by Mvapich. It is OpenMPI specific.
-			continue;
+		//if (MPI_T_ERR_INVALID_INDEX == err)// { NOTE TZI: This variable is not recognized by Mvapich. It is OpenMPI specific.
+		//	continue;
 
 		CHECKERR("CVARINFO",err);
 
@@ -590,6 +591,7 @@ void list_cvars()
 				if (dt==MPI_INT)
 				{
 					err=MPI_T_cvar_read(handle,&v_int);
+					
 					CHECKERR("CVARREAD",err);
 					if (et==MPI_T_ENUM_NULL)
 					{
@@ -815,7 +817,6 @@ int main(int argc, char *argv[])
 		/* Header */
 
 		printf("MPI_T Variable List\n");
-
 
 		if (runmpi)
 		{
