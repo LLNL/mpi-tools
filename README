@@ -1,0 +1,5 @@
+#If you get the following error message
+#Error msg:
+fatal: unable to access 'https://username@github.com/scalability-llnl/mpi-tools.git/': Peer certificate cannot be authenticated with known CA certificates
+#try executing this command:
+git config http.sslVerify false
