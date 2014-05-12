@@ -17,7 +17,3 @@ We have developed a set of simple MPI_T tools to get tool writers
 started on the path to more sophisticated support of the new interface
 and make them available here. The tools are Gyan and VarList.
 
-#If you get the following error message :
-"unable to access 'https://username@github.com/scalability-llnl/mpi-tools.git/': Peer certificate cannot be authenticated with known CA certificates"
-#try executing this command:
-git config http.sslVerify false
