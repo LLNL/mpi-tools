@@ -1,5 +1,23 @@
-#If you get the following error message
-#Error msg:
-fatal: unable to access 'https://username@github.com/scalability-llnl/mpi-tools.git/': Peer certificate cannot be authenticated with known CA certificates
+
+MPI_T is an interface for tools introduced in the 3.0 version of MPI.
+The interface provides mechanisms for tools to access and set
+performance and control variables that are exposed by an MPI
+implementation. For example, a tool may be able to record the length
+of the unexpected message queue over the course of the execution; or a
+tool could set the value of the "eager limit" for better message
+passing performance.  The number and types of variables that are
+exposed is completely determined by the MPI implementation and need to
+be discovered by tools via the query interface. Thus, tool writers
+need to take care to code in such a way that they are not dependent on
+a single implementation's variables.  Major implementations, including
+Open MPI , MPICH and MVAPICH, are working to support this interface,
+so the functionality will be available to tools in the near future.
+
+We have developed a set of simple MPI_T tools to get tool writers
+started on the path to more sophisticated support of the new interface
+and make them available here. The tools are Gyan and VarList.
+
+#If you get the following error message :
+"unable to access 'https://username@github.com/scalability-llnl/mpi-tools.git/': Peer certificate cannot be authenticated with known CA certificates"
 #try executing this command:
 git config http.sslVerify false
