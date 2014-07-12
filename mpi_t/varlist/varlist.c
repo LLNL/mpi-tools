@@ -670,7 +670,7 @@ void list_cvars()
 			}
 		}
 
-		if (handle==MPI_T_CVAR_HANDLE_NULL)
+		if (handle!=MPI_T_CVAR_HANDLE_NULL)
 		{
 			MPI_T_cvar_handle_free(&handle);
 			CHECKERR("CVAR-FREE",err);
