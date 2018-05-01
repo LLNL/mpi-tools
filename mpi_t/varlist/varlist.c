@@ -736,6 +736,12 @@ int main(int argc, char *argv[])
 	int rank;
 	int opt,erropt;
 	int reqthread=MPI_THREAD_MULTIPLE;
+    
+    int minor,major;
+    
+    char libversion[MPI_MAX_LIBRARY_VERSION_STRING];
+    int libversionlen;
+    
 
 	/* Read options */
 
@@ -816,7 +822,19 @@ int main(int argc, char *argv[])
 
 		/* Header */
 
-		printf("MPI_T Variable List\n");
+		printf("MPI_T Variable List\n\n");
+        
+        /* Print Version */
+        
+        err=MPI_Get_version(&major,&minor);
+        CHECKERR("T_Init",err);
+        printf("  MPI Version: %i.%i\n",major,minor);
+        
+        err=MPI_Get_library_version(libversion,&libversionlen);
+        CHECKERR("T_Init",err);
+        printf("  MPI Library Version: %s\n\n",libversion);
+
+        /* Print thread support */
 
 		if (runmpi)
 		{
